@@ -42,6 +42,7 @@ as.source_list.list <- function(x) x
 #' Depending on the source, this is some subset of the fields in the packages
 #' \code{DESCRIPTION}
 #' 
+#' @return a named list of fields, or \code{NULL} if package is not found.
 #' @export
 #' @examples
 #' offline_packages()
@@ -50,4 +51,19 @@ as.source_list.list <- function(x) x
 #' package_info(installed(), "ggplot2")
 package_info <- function(source, package) {
   UseMethod("package_info")
+}
+
+#' Does the source provide a package?
+#' 
+#' @export
+#' @examples
+#' offline_packages()
+#' has_package(cran("source"), "ggplot2")
+#' has_package(cran("binary"), "ggplot2")
+#' has_package(installed(), "ggplot2")
+#' has_package(cran("source"), "ggplot4")
+#' has_package(cran("binary"), "ggplot4")
+#' has_package(installed(), "ggplot4")
+has_package <- function(source, package) {
+  UseMethod("has_package")
 }

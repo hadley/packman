@@ -58,6 +58,12 @@ package_info.cran <- function(source, package) {
   as.list(info)
 }
 
+#' @S3method has_package cran
+has_package.cran <- function(source, package) {
+  packages <- packages_gz(source$url)
+  any(packages$Package == package)
+}
+
 #' @importFrom digest digest
 packages_gz <- function(url) {
   base_path <- file.path(tempdir(), digest(url))
