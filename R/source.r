@@ -49,8 +49,19 @@ as.source_list.list <- function(x) x
 #' package_info(cran("source"), "ggplot2")
 #' package_info(cran("binary"), "ggplot2")
 #' package_info(installed(), "ggplot2")
+#' 
+#' package_info(c(cran("source"), installed()), "abind")
 package_info <- function(source, package) {
   UseMethod("package_info")
+}
+
+package_info.source_list <- function(source, package) {
+  for(single in source) {
+    if (has_package(single, package)) {
+      return(package_info(single, package))
+    }
+  }
+  NULL
 }
 
 #' Does the source provide a package?
@@ -66,4 +77,8 @@ package_info <- function(source, package) {
 #' has_package(installed(), "ggplot4")
 has_package <- function(source, package) {
   UseMethod("has_package")
+}
+
+install <- function(source, package) {
+  UseMethod("install")
 }

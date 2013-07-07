@@ -27,7 +27,7 @@ cran <- function(type = "binary", repos = getOption("repos")) {
   }
   
   url <- contrib.url(repos[[1]], type)
-  source("cran", url = url)
+  source("cran", url = url, type = type)
 }
 
 #' @S3method print cran
@@ -85,7 +85,36 @@ packages_gz <- function(url) {
   }
 }
 
+install.cran <- function(source, package, library, ...) {
+  src <- package_url(source, package)
+  
+  dest <- file.path(tempdir(), basename(src))
+  if (!file.exists(dest)) {
+    download.file(src, dest, quiet = TRUE)  
+  }
+  
+  if (source$type == "source") {
+    built <- build_package(dest, ...)
+    install_binary_package(built, library, ...)
+  } else {
+    install_binary(dest, library, ...)
+  }
+  
+}
 
+package_url.cran <- function(source, package) {
+  info <- package_info(source, package)
+  if (is.null(info)) {
+    stop("Package ", package, " not found in ", source$url, call. = FALSE)
+  }
+  
+  ext <- switch(source$type, 
+                source = "tar.gz", 
+                mac.binary = "tgz", 
+                win.binary = "zip")
+
+  paste0(source$url, "/", info$Package, "_", info$Version, ".", ext)
+}
 
 #' @export
 offline_packages <- function() {

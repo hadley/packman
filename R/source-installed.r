@@ -26,3 +26,7 @@ package_info.installed <- function(source, package) {
 has_package.installed <- function(source, package) {
   length(find.package(package, source$paths, quiet = TRUE)) == 1
 }
+
+install.installed <- function(source, package) {
+  TRUE
+}
