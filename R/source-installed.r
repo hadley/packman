@@ -12,3 +12,12 @@ installed <- function(paths = .libPaths()) {
 print.installed <- function(x, ...) {
   cat("<Source> Installed packages: \n", paste0("* ", x$paths, "\n"), sep = "")
 }
+
+#' @S3method package_info installed
+package_info.installed <- function(source, package) {
+  path <- find.package(package, source$paths, quiet = TRUE)
+  if (length(path) != 1) return(NULL)
+  
+  dcf <- read.dcf(file.path(path, "DESCRIPTION"))
+  as.list(as.data.frame(dcf, stringsAsFactors = FALSE))
+}

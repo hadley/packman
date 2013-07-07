@@ -48,3 +48,47 @@ has_dev_env <- function() {
 }
 
 pkg_types <- c("win.binary", "mac.binary", "source")
+
+#' @S3method package_info cran
+package_info.cran <- function(source, package) {
+  packages <- packages_gz(source$url)
+  info <- packages[packages$Package == package, ]
+  if (nrow(info) != 1) return(NULL)
+  
+  as.list(info)
+}
+
+#' @importFrom digest digest
+packages_gz <- function(url) {
+  base_path <- file.path(tempdir(), digest(url))
+  
+  # Download complete .gz file if needed
+  path_gz <- paste0(base_path, ".gz")
+  if (!file.exists(path_gz)) {
+    download.file(url, path_gz, quiet = TRUE)  
+  }
+  
+  # Cache as rds file
+  path_rds <- paste0(base_path, ".rds")
+  if (!file.exists(path_rds)) {
+    packages <- as.data.frame(read.dcf(path_gz), stringsAsFactors = FALSE)
+    saveRDS(packages, path_rds)
+    packages
+  } else {
+    readRDS(path_rds)
+  }
+}
+
+
+
+#' @export
+offline_packages <- function() {
+  types <- c("source", "win.binary", "mac.binary")
+  for (type in types) {
+    url <- cran(type)$url
+    dest <- paste0(tempdir(), "/", digest(url), ".gz")
+    src <- system.file("extdata", paste0("packages-", type, ".gz"), package = "packman")
+    
+    file.copy(src, dest)
+  }
+}

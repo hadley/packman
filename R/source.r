@@ -37,3 +37,17 @@ as.source_list.source_list <- function(x) x
 #' @S3methos as.source_list source_list
 as.source_list.list <- function(x) x
 
+#' Get information about a package.
+#' 
+#' Depending on the source, this is some subset of the fields in the packages
+#' \code{DESCRIPTION}
+#' 
+#' @export
+#' @examples
+#' offline_packages()
+#' package_info(cran("source"), "ggplot2")
+#' package_info(cran("binary"), "ggplot2")
+#' package_info(installed(), "ggplot2")
+package_info <- function(source, package) {
+  UseMethod("package_info")
+}
