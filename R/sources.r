@@ -21,9 +21,9 @@ as.sources.sources <- function(x) x
 as.sources.list <- function(x) x
 
 
-package_info.sources <- function(source, package) {
+package_info.sources <- function(source, package, version) {
   for(single in source) {
-    if (has_package(single, package)) {
+    if (has_package(single, package, version)) {
       return(package_info(single, package))
     }
   }

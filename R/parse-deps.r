@@ -49,3 +49,18 @@ parse_deps <- function(string) {
   # Remove R dependency
   deps[names != "R", ]
 }
+
+compare_versions <- function(target, expr = NULL) {
+  if (is.null(expr)) return(TRUE)
+
+  compare  <- sub("^(\\S+)\\s+.*$", "\\1", expr)[[1]]
+  if (!(compare %in% c(">", ">=", "==", "<=", "<"))) {
+    stop("Invalid comparison operator: ", compare)
+  }
+  compare_f <- match.fun(compare)
+  
+  version <- sub("^\\S+\\s+(.*)$", "\\1", expr)[[1]]
+  ver <- numeric_version(version)
+  
+  compare_f(target, ver)
+}

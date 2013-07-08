@@ -44,10 +44,9 @@ package_info <- function(source, package) {
 #' has_package(cran("source"), "ggplot4")
 #' has_package(cran("binary"), "ggplot4")
 #' has_package(installed(), "ggplot4")
-has_package <- function(source, package) {
+has_package <- function(source, package, version = NULL) {
   UseMethod("has_package")
 }
-
 
 #' Install a package from source.
 #' 

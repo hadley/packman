@@ -59,9 +59,15 @@ package_info.cran <- function(source, package) {
 }
 
 #' @S3method has_package cran
-has_package.cran <- function(source, package) {
-  packages <- packages_gz(source$url)
-  any(packages$Package == package)
+has_package.cran <- function(source, package, version = NULL) {
+  
+  if (is.null(version)) {
+    packages <- packages_gz(source$url)  
+    any(packages$Package == package)
+  } else {
+    info <- package_info(source, package)
+    compare_versions(info$Version, version)
+  }
 }
 
 #' @importFrom digest digest

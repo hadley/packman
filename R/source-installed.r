@@ -30,8 +30,13 @@ package_info.installed <- function(source, package) {
 }
 
 #' @S3method has_package installed
-has_package.installed <- function(source, package) {
-  length(find.package(package, source$paths, quiet = TRUE)) == 1
+has_package.installed <- function(source, package, version = NULL) {
+  if (is.null(version)) {
+    length(find.package(package, source$paths, quiet = TRUE)) == 1  
+  } else {
+    info <- package_info(source, package)
+    compare_versions(info$Version, version)
+  } 
 }
 
 #' @S3method install installed
