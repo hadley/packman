@@ -28,13 +28,12 @@ c.source <- function(...) {
   source_list(...)
 }
 
-#' @export
 as.source_list <- function(x) UseMethod("as.source_list")
-#' @S3methos as.source_list source
+#' @S3method as.source_list source
 as.source_list.source <- function(x) list(x)
-#' @S3methos as.source_list source_list
+#' @S3method as.source_list source_list
 as.source_list.source_list <- function(x) x
-#' @S3methos as.source_list source_list
+#' @S3method as.source_list source_list
 as.source_list.list <- function(x) x
 
 #' Get information about a package.
@@ -78,7 +77,31 @@ package_info.source_list <- function(source, package) {
 has_package <- function(source, package) {
   UseMethod("has_package")
 }
+has_package.source_list <- function(source, package) {
+  for(single in source) {
+    if (has_package(single, package)) {
+      return(TRUE)
+    }
+  }
+  FALSE
+}
 
 install <- function(source, package) {
   UseMethod("install")
+}
+
+install.source <- function(source, package, library, ...) {
+  src <- package_url(source, package)
+  
+  dest <- file.path(tempdir(), basename(src))
+  if (!file.exists(dest)) {
+    download.file(src, dest, quiet = TRUE)  
+  }
+  
+  if (file_ext(dest) == ".tar.gz") {
+    built <- build_package(dest, ...)
+    install_binary_package(built, library, ...)
+  } else {
+    install_binary(dest, library, ...)
+  }
 }

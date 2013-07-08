@@ -85,22 +85,6 @@ packages_gz <- function(url) {
   }
 }
 
-install.cran <- function(source, package, library, ...) {
-  src <- package_url(source, package)
-  
-  dest <- file.path(tempdir(), basename(src))
-  if (!file.exists(dest)) {
-    download.file(src, dest, quiet = TRUE)  
-  }
-  
-  if (source$type == "source") {
-    built <- build_package(dest, ...)
-    install_binary_package(built, library, ...)
-  } else {
-    install_binary(dest, library, ...)
-  }
-  
-}
 
 package_url.cran <- function(source, package) {
   info <- package_info(source, package)
