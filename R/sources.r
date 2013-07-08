@@ -5,7 +5,7 @@ sources <- function(..., .sources = list()) {
   source2 <- list(as.sources(.sources))
 
   sources <- unlist(c(source1, source2), recursive = FALSE, use.names = FALSE)
-  structure(sources, class = "sources")
+  structure(sources, class = c("sources", "source"))
 }
 #' @S3method c sources
 c.sources <- function(...) {
