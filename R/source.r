@@ -47,19 +47,23 @@ package_info <- function(source, package) {
 has_package <- function(source, package) {
   UseMethod("has_package")
 }
-has_package.sources <- function(source, package) {
-  for(single in source) {
-    if (has_package(single, package)) {
-      return(TRUE)
-    }
-  }
-  FALSE
-}
 
-install <- function(source, package) {
+
+#' Install a package from source.
+#' 
+#' @section Default method
+#' The default method downloads the package from \code{\link{package_url}},
+#' builds it if needed (i.e. if it's a source package), and then installs it
+#' with \code{\link{install_binary_package}}.
+#' 
+#' @export
+install <- function(source, package, library, ...) {
   UseMethod("install")
 }
 
+#' @method install source
+#' @export
+#' @rdname install
 install.source <- function(source, package, library, ...) {
   src <- package_url(source, package)
 
@@ -74,4 +78,11 @@ install.source <- function(source, package, library, ...) {
   } else {
     install_binary(dest, library, ...)
   }
+}
+
+#' Find the location of a package in a given source.
+#'
+#' @export
+package_url <- function(source, package) {
+  UseMethod("package_url")
 }

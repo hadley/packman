@@ -29,3 +29,12 @@ package_info.sources <- function(source, package) {
   }
   NULL
 }
+
+has_package.sources <- function(source, package) {
+  for(single in source) {
+    if (has_package(single, package)) {
+      return(TRUE)
+    }
+  }
+  FALSE
+}
