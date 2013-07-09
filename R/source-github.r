@@ -71,16 +71,11 @@ install.github <- function(source, package, library, ...) {
               library = library, ...)
 }
 
-# https://github.com/hadley/ggplot2/raw/master/DESCRIPTION
 description_url <- function(x, package) {
   paste0(base_url(x, "raw", package), "/DESCRIPTION")
 }
+
 base_url <- function(x, base_dir, package) {
   paste0("https://github.com/", x$username, "/", x$repo %||% package, 
          "/", base_dir, "/", x$ref)
 }
-cache_url <- memoise(function(url, ...) {
-  req <- GET(url, ...)
-  stop_for_status(req)
-  content(req, as = "text")
-})
