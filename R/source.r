@@ -27,6 +27,7 @@ c.source <- function(...) {
 #' package_info(cran("source"), "ggplot2")
 #' package_info(cran("binary"), "ggplot2")
 #' package_info(installed(), "ggplot2")
+#' package_info(github(), "ggplot2")
 #'
 #' package_info(c(cran("source"), installed()), "abind")
 package_info <- function(source, package) {

@@ -55,7 +55,9 @@ package_info.cran <- function(source, package) {
   info <- packages[packages$Package == package, ]
   if (nrow(info) != 1) return(NULL)
   
-  as.list(info)
+  info <- as.list(info)
+  info$source <- source
+  info
 }
 
 #' @S3method has_package cran
@@ -83,7 +85,7 @@ packages_gz <- function(url) {
   # Cache as rds file
   path_rds <- paste0(base_path, ".rds")
   if (!file.exists(path_rds)) {
-    packages <- read_dcf(path_gz)
+    packages <- as.data.frame(read.dcf(path_gz), stringsAsFactors = FALSE)
     saveRDS(packages, path_rds)
     packages
   } else {

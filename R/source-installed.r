@@ -25,7 +25,7 @@ package_info.installed <- function(source, package) {
   path <- find.package(package, source$paths, quiet = TRUE)
   if (length(path) != 1) return(NULL)
   
-  read_dcf(file.path(path, "DESCRIPTION"))
+  read_dcf(file.path(path, "DESCRIPTION"), source)
 }
 
 #' @S3method has_package installed

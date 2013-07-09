@@ -21,7 +21,7 @@
 #' w <- github("wch")
 #' has_package(w, "extrafont")
 #' has_package(c(h, w), "extrafont")
-github <- function(username, repo = NULL, ref = "master", subdir = NULL, 
+github <- function(username = "hadley", repo = NULL, ref = "master", subdir = NULL, 
                    auth_user = NULL, password = NULL) {
   
   if (!is.null(auth_user)) {
@@ -56,7 +56,7 @@ package_info.github <- function(source, package) {
   url <- description_url(source, package)
   
   desc <- cache_url(url, source$auth)
-  read_dcf(textConnection(desc))
+  read_dcf(textConnection(desc), source)
 }
 
 #' @S3method package_url github

@@ -2,8 +2,11 @@ last <- function(x) x[length(x)]
 
 "%||%" <- function(a, b) if (is.null(a)) b else a
 
-read_dcf <- function(x, ...) {
-  as.list(as.data.frame(read.dcf(x, ...), stringsAsFactors = FALSE))
+read_dcf <- function(x, source, ...) {
+  dcf <- read.dcf(x, ...)
+  obj <- as.list(as.data.frame(dcf, stringsAsFactors = FALSE))
+  obj$source <- source
+  obj
 }
 
 cache_url <- memoise(function(url, ...) {
