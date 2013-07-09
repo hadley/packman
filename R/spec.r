@@ -15,6 +15,8 @@
 
 #' @export
 parse_spec <- function(spec) {
+  if (is.null(spec)) return(NULL)
+  
   tryCatch(
     expr <- parse(text = spec),
     error = function(e) {
