@@ -13,14 +13,19 @@
 #' @param password The password to use for authentication
 #' @export
 #' @examples
-#' github("hadley")
-#' github("wch")
-github <- function(username, repo = NULL, ref = NULL, subdir = NULL, 
+#' h <- github("hadley")
+#' has_package(h, "ggplot2")
+#' has_package(h, "ggplot3")
+#' package_info(h, "ggplot2")
+#' 
+#' w <- github("wch")
+#' has_package(w, "extrafont")
+#' has_package(c(h, w), "extrafont")
+github <- function(username, repo = NULL, ref = "master", subdir = NULL, 
                    auth_user = NULL, password = NULL) {
   
   source("github", username = username, repo = repo, ref = ref, subdir = subdir, 
          auth_user = auth_user, password = password)
-  
 }
 
 #' @S3method print github
@@ -29,3 +34,35 @@ print.github <- function(x, ...) {
   if (!is.null(x$password)) cat(" (with authentication)")
   cat("\n")
 }
+
+#' @S3method has_package github
+has_package.github <- function(source, package, version = NULL) {
+  if (is.null(version)) {
+    url_ok(description_url(source, package))
+  } else {
+    info <- package_info(source, package)
+    compare_versions(info$Version, version)
+  }
+} 
+
+#' @S3method package_info github
+package_info.github <- function(source, package) {
+  url <- description_url(source, package)
+  
+  desc <- cache_url(url)
+  read_dcf(textConnection(desc))
+}
+
+# https://github.com/hadley/ggplot2/raw/master/DESCRIPTION
+description_url <- function(x, package) {
+  paste0(base_url(x, "raw", package), "/DESCRIPTION")
+}
+base_url <- function(x, base_dir, package) {
+  paste0("https://github.com/", x$username, "/", x$repo %||% package, 
+         "/", base_dir, "/", x$ref)
+}
+cache_url <- memoise(function(url) {
+  req <- GET(url)
+  stop_for_status(req)
+  content(req, as = "text")
+})
