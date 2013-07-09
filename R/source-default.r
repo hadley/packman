@@ -15,7 +15,9 @@
 #'   that are already installed.
 #' @export
 #' @examples
-#' default_sources()
+#' def <- default_sources()
+#' def
+#' package_info(def, "ggplot2")
 default_sources <- function(force = FALSE) {
   sources <- list()
 

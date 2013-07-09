@@ -24,6 +24,8 @@
   available for the current platform. }
 }
 \examples{
-default_sources()
+def <- default_sources()
+def
+package_info(def, "ggplot2")
 }
 
