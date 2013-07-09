@@ -7,7 +7,7 @@
 #'   \item \code{\link{installed}()}, if \code{force} is \code{FALSE}.
 #'   \item \code{\link{cran}("source")}, if a development environment is
 #'     available.
-#'   \item \code{\link{cran}("binary)}, if binary packages are available for
+#'   \item \code{\link{cran}("binary")}, if binary packages are available for
 #'     the current platform.
 #' }
 #' @param force if \code{TRUE}, will not include currently installed packages

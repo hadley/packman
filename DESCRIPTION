@@ -3,6 +3,28 @@ Title:
 Description: 
 Version: 0.1
 Authors@R: 'Hadley Wickham <h.wickham@gmail.com> [aut,cre]'
-Depends: R (>= 3.0.0), assertthat, digest, httr, memoise
+Depends:
+    R (>= 3.0.0),
+    assertthat,
+    digest,
+    httr,
+    memoise
 License: GPL-3
 LazyData: true
+Collate:
+    'build.r'
+    'check-deps.r'
+    'decompress.r'
+    'download.r'
+    'dr-packman.r'
+    'find-dependencies.r'
+    'install.r'
+    'parse-deps.r'
+    'source-cran.r'
+    'source-default.r'
+    'source-github.r'
+    'source-installed.r'
+    'source.r'
+    'sources.r'
+    'spec.r'
+    'utils.r'
