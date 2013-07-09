@@ -24,8 +24,14 @@
 github <- function(username, repo = NULL, ref = "master", subdir = NULL, 
                    auth_user = NULL, password = NULL) {
   
+  if (!is.null(auth_user)) {
+    auth <- authenticate(auth_user, auth_pass)
+  } else {
+    auth <- list()
+  }
+  
   source("github", username = username, repo = repo, ref = ref, subdir = subdir, 
-         auth_user = auth_user, password = password)
+         auth = auth)
 }
 
 #' @S3method print github
@@ -38,7 +44,7 @@ print.github <- function(x, ...) {
 #' @S3method has_package github
 has_package.github <- function(source, package, version = NULL) {
   if (is.null(version)) {
-    url_ok(description_url(source, package))
+    url_ok(description_url(source, package), source$auth)
   } else {
     info <- package_info(source, package)
     compare_versions(info$Version, version)
@@ -49,8 +55,20 @@ has_package.github <- function(source, package, version = NULL) {
 package_info.github <- function(source, package) {
   url <- description_url(source, package)
   
-  desc <- cache_url(url)
+  desc <- cache_url(url, source$auth)
   read_dcf(textConnection(desc))
+}
+
+#' @S3method package_url github
+package_url.github <- function(source, package) {
+  paste0(base_url(source, "archive", package), ".zip")
+}
+
+#' @S3method install github
+install.github <- function(source, package, library, ...) {
+  url <- package_url(source, package)
+  install_url(url, package, subdir = source$subdir, config = source$auth,
+              library = library, ...)
 }
 
 # https://github.com/hadley/ggplot2/raw/master/DESCRIPTION
@@ -61,8 +79,8 @@ base_url <- function(x, base_dir, package) {
   paste0("https://github.com/", x$username, "/", x$repo %||% package, 
          "/", base_dir, "/", x$ref)
 }
-cache_url <- memoise(function(url) {
-  req <- GET(url)
+cache_url <- memoise(function(url, ...) {
+  req <- GET(url, ...)
   stop_for_status(req)
   content(req, as = "text")
 })
