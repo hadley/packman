@@ -83,7 +83,7 @@ packages_gz <- function(url) {
   # Cache as rds file
   path_rds <- paste0(base_path, ".rds")
   if (!file.exists(path_rds)) {
-    packages <- as.data.frame(read.dcf(path_gz), stringsAsFactors = FALSE)
+    packages <- read_dcf(path_gz)
     saveRDS(packages, path_rds)
     packages
   } else {
