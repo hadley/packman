@@ -21,6 +21,7 @@ as.sources.sources <- function(x) x
 as.sources.list <- function(x) x
 
 
+#' @S3method package_info sources
 package_info.sources <- function(source, package, version) {
   for(single in source) {
     if (has_package(single, package, version)) {
@@ -30,6 +31,7 @@ package_info.sources <- function(source, package, version) {
   NULL
 }
 
+#' @S3method has_package sources
 has_package.sources <- function(source, package) {
   for(single in source) {
     if (has_package(single, package)) {

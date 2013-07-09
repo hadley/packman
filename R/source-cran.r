@@ -92,6 +92,7 @@ packages_gz <- function(url) {
 }
 
 
+#' @S3method package_url cran
 package_url.cran <- function(source, package) {
   info <- package_info(source, package)
   if (is.null(info)) {
