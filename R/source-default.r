@@ -19,19 +19,22 @@
 #' def
 #' package_info(def, "ggplot2")
 default_sources <- function(force = FALSE) {
-  sources <- list()
+  sources <- list(recommended())
+  add_source <- function(x) {
+    sources <<- c(sources, list(x))
+  }
 
   if (!force) {
-    sources$installed <- installed()
+    add_source(installed())
   }
 
   if (.Platform$pkgType != "source") {
-    sources$binary <- cran("binary")
+    add_source(cran("binary"))
   }
 
   if (has_dev_env()) {
-    sources$source <- cran("source")
+    add_source(cran("source"))
   }
 
-  sources(sources)
+  sources(.sources = sources)
 }

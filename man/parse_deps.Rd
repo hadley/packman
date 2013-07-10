@@ -9,9 +9,9 @@
   3.0), ggplot2"} etc.}
 }
 \value{
-  list of two character vectors: \code{name} package names,
-  and \code{version} package versions. If version is not
-  specified, it will be stored as NA.
+  data.frame with two character variables: \code{name}
+  package names, and \code{version} package versions. If
+  version is not specified, it will be stored as NA.
 }
 \description{
   Parse package dependency strings.

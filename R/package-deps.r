@@ -48,7 +48,6 @@ find_dependencies <- function(pkg = NULL,
 #' 
 #' @param info a list containing package information
 #' @param from which fields to consider dependencies from
-#' @param 
 #' @examples
 #' ggplot2 <- package_info(default_sources(), "ggplot2")
 #' package_deps(ggplot2)

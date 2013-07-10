@@ -17,7 +17,6 @@ Collate:
     'decompress.r'
     'download.r'
     'dr-packman.r'
-    'find-dependencies.r'
     'install.r'
     'parse-deps.r'
     'source-cran.r'
@@ -28,3 +27,4 @@ Collate:
     'sources.r'
     'spec.r'
     'utils.r'
+    'package-deps.r'

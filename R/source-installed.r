@@ -1,7 +1,9 @@
 #' Package source: installed packages
 #' 
 #' This source represents packages that are already installed on-disk. By
-#' default it uses all libraries found in \code{\link{.libPaths}}.
+#' default it uses all libraries found in \code{\link{.libPaths}}. Installed
+#' packages are divided into base and other libraries to avoid every 
+#' reinstalling base packages (which is a bad idea).
 #' 
 #' @param paths A character vector of library paths.
 #' @export
@@ -9,9 +11,10 @@
 #' inst <- installed()
 #' inst
 #' has_package(inst, "ggplot2")
-#' package_info(inst, "MASS")
-#' package_url(inst, "lattice")
-installed <- function(paths = .libPaths()) {
+#' 
+#' package_info(base(), "MASS")
+#' package_url(base(), "lattice")
+installed <- function(paths = head(.libPaths(), -1)) {
   source("installed", paths = paths)
 }
 
@@ -47,4 +50,16 @@ install.installed <- function(source, package) {
 package_url.installed <- function(source, package) {
   path <- find.package(package, source$paths, quiet = TRUE)
   paste0("file://", path)
+}
+
+#' @rdname installed
+#' @export
+base <- function() {
+  source(c("base", "installed"), paths = last(.libPaths()))
+}
+
+#' @S3method install base 
+install.base <- function(source, package) {
+  warning("Skipping re-installation of base package ", package, call. = FALSE)
+  TRUE
 }
