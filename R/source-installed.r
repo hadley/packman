@@ -61,6 +61,8 @@ base <- function() {
   source(c("base", "installed"), paths = path)
 }
 
+is.base <- function(x) inherits(x, "base")
+
 #' @S3method install base 
 install.base <- function(source, package) {
   warning("Skipping re-installation of base package ", package, call. = FALSE)

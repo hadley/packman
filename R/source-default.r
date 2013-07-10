@@ -19,7 +19,7 @@
 #' def
 #' package_info(def, "ggplot2")
 default_sources <- function(force = FALSE) {
-  sources <- list(recommended())
+  sources <- list(base())
   add_source <- function(x) {
     sources <<- c(sources, list(x))
   }
