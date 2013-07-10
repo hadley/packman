@@ -1,6 +1,7 @@
 #' Find all dependencies of a package.
 #' 
 #' @export
+#' @examples
 #' find_dependencies("ggplot2")
 find_dependencies <- function(pkg = NULL, 
                               from = c("Depends", "Imports", "LinkingTo"),

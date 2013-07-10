@@ -9,4 +9,7 @@
 \description{
   Find all dependencies of a package.
 }
+\examples{
+find_dependencies("ggplot2")
+}
 

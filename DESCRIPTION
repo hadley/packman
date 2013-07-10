@@ -28,3 +28,4 @@ Collate:
     'spec.r'
     'utils.r'
     'package-deps.r'
+    'package.r'
