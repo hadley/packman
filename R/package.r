@@ -37,7 +37,7 @@ as.description.character <- function(x, source) {
 #' @S3method as.description connection
 as.description.connection <- function(x, source) {
   already_open <- isOpen(x)
-  if (already_open) on.exit(close(x))
+  if (!already_open) on.exit(close(x))
   
   dcf <- read.dcf(x)
   obj <- as.list(as.data.frame(dcf, stringsAsFactors = FALSE))
