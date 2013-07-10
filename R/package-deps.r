@@ -39,17 +39,6 @@ find_dependencies <- function(pkg = NULL,
   all_deps
 }
 
-# Should have option to exclude base packages
-# (maybe shouldn't be in installed by default, but instead should be own)
-# Should not install base packages. Should warn when installing recommended
-# packages
-
-# Need package source that just takes a directory of files called 
-# xxx.dcf (for testing).  Should have easy way of creating given
-# a starting package (e.g. all non-base dependencies of ggplot2)
-
-# Make list of potential failure modes and start creating test cases.
-
 #' Find package info for dependencies.
 #' 
 #' @param info a list containing package information
