@@ -29,3 +29,4 @@ Collate:
     'utils.r'
     'package-deps.r'
     'package.r'
+    'source-test.r'
