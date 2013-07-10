@@ -55,9 +55,7 @@ package_info.cran <- function(source, package) {
   info <- packages[packages$Package == package, ]
   if (nrow(info) != 1) return(NULL)
   
-  info <- as.list(info)
-  info$source <- source
-  info
+  as.description(info, source)
 }
 
 #' @S3method has_package cran

@@ -56,7 +56,7 @@ package_info.github <- function(source, package) {
   url <- description_url(source, package)
   
   desc <- cache_url(url, source$auth)
-  read_dcf(textConnection(desc), source)
+  as.description(desc, source)
 }
 
 #' @S3method package_url github
