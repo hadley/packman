@@ -2,10 +2,11 @@
 #' 
 #' This source represents packages that are already installed on-disk. By
 #' default it uses all libraries found in \code{\link{.libPaths}}. Installed
-#' packages are divided into base and other libraries to avoid every 
+#' packages are divided into base and other libraries to avoid ever
 #' reinstalling base packages (which is a bad idea).
 #' 
-#' @param paths A character vector of library paths.
+#' @param paths A character vector of library paths.  \code{.Library} is always
+#'   removed as it is provided by the base source.
 #' @export
 #' @examples
 #' inst <- installed()
@@ -14,7 +15,8 @@
 #' 
 #' package_info(base(), "MASS")
 #' package_url(base(), "lattice")
-installed <- function(paths = head(.libPaths(), -1)) {
+installed <- function(paths = .libPaths()) {
+  paths <- setdiff(normalizePath(paths), normalizePath(.Library))
   source("installed", paths = paths)
 }
 
@@ -55,7 +57,8 @@ package_url.installed <- function(source, package) {
 #' @rdname installed
 #' @export
 base <- function() {
-  source(c("base", "installed"), paths = last(.libPaths()))
+  path <- normalizePath(.Library)
+  source(c("base", "installed"), paths = path)
 }
 
 #' @S3method install base 
