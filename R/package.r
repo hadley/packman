@@ -12,6 +12,7 @@ description <- function(...) {
 #' @S3method print description
 print.description <- function(x, ...) {
   cat("<Package> ", x$Package, "\n", sep = "")
+  print(x$source)
 }
 
 #' @export
