@@ -77,6 +77,6 @@ package_deps <- function(info, from = c("Depends", "Imports", "LinkingTo"),
   # TODO: use version restriction as well!
   lapply(pkgs, function(pkg) {
     source <- c(sources, pkg_sources$default, sources[[pkg]])
-    package_info(source, pkg)
+    package_info(source, pkg) %||% package_info(missing_source(), pkg)
   })
 }
