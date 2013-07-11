@@ -31,3 +31,4 @@ Collate:
     'package.r'
     'source-test.r'
     'source-missing.r'
+    'package-topo-sort.r'
