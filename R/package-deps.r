@@ -65,11 +65,11 @@ find_dependencies <- function(pkg = NULL,
 #' package_deps(ggplot2)
 package_deps <- function(info, from = c("Depends", "Imports", "LinkingTo"), 
                          sources = default_sources()) {
-  pkg_sources <- parse_spec(info$Sources)
+  pkg_sources <- info$.sources
   
   # Parse all dependences into single dataframe
-  parsed <- lapply(info[from], parse_deps)
-  deps <- do.call("rbind", unname(parsed))
+  deps <- info$.dependencies
+  deps <- deps[deps$field %in% from, , drop = FALSE]
   
   # For each package, find the info that conforms to the spec
   pkgs <- setNames(deps$name, deps$name)
