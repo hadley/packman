@@ -1,55 +1,62 @@
-#' Find all (recursive) dependencies of a package.
+#' Given a list of packages, add all their dependencies.
 #' 
-#' @param pkg a single package name
+#' @param pkg a character vector of package names
 #' @param from which DESCRIPTION fields to use to compute dependencies.
 #'    Defaults to depends, imports and linking to
 #' @param sources The sources in which to look for \code{pkg}. These will also
 #'    be used for dependencies of \code{pkg}, as well as any additional 
 #'    sources described in individual packages.
+#' @return a list of packages topologically sorted by their dependencies
 #' @export
 #' @examples
-#' deps <- find_dependencies("ggplot2")
-#' sapply(deps, is.installed)
+#' # Create some packages to use
+#' ggplot2 <- list(package_info(default_sources(), "ggplot2"))
+#' scales <- list(package_info(default_sources(), "scales"))
+#' abind <- list(package_info(default_sources(), "abind"))
 #' 
+#' deps <- add_dependencies(ggplot2)
+#' length(deps)
+#' sapply(deps, is.installed)
+#'
 #' # Base packages are never included in the list of dependencies
 #' sapply(deps, is.base)
 #' 
+#' length(add_dependencies(scales))
+#' length(add_dependencies(c(ggplot2, scales)))
+#' length(add_dependencies(c(ggplot2, abind)))
+#' 
 #' # Supplying a different set of sources will determine whether or not
 #' # packages are already installed.
-#' deps2 <- find_dependencies("ggplot2", sources = default_sources(TRUE))
+#' deps2 <- add_dependencies(ggplot2, sources = default_sources(TRUE))
 #' sapply(deps2, is.installed)
-find_dependencies <- function(pkg = NULL, 
+add_dependencies <- function(pkgs = NULL, 
                               from = c("Depends", "Imports", "LinkingTo"),
                               sources = default_sources()) {
-  assert_that(is.string(pkg))
+  assert_that(is.list(pkgs) && is.vector(pkgs))
   assert_that(is.character(from), length(from) > 0)
   assert_that(is.source(sources))
-  
-  info <- package_info(sources, pkg)
-  if (is.null(info)) stop("Couldn't find info about ", pkg, call. = FALSE)
   
   all_deps <- list()
   seen <- character()
 
-  to_see <- list()
-  to_see[[pkg]] <- info
-  
-  while (length(to_see) > 0) {
-    next_pkg <- to_see[[1]]
-    deps <- package_deps(next_pkg, from, sources = sources)
-
+  visit <- function(pkg) {
+    if (pkg$Package %in% seen) return()
+    seen <<- c(seen, pkg$Package)
+    
+    deps <- package_deps(pkg, from, sources = sources)
     # Remove base packages since by definition all their dependencies
     # are available
     deps <- Filter(function(x) !is.base(x$source), deps)
-    
-    new_deps <- deps[setdiff(names(deps), seen)]
-    # Maybe this should actually be deps, and then a second pass should go
-    # through and collapse - currently only the first dependency is 
-    # captured
-    all_deps <- c(all_deps, new_deps)
-    to_see <- c(to_see[-1], new_deps)
 
-    seen <- c(seen, next_pkg$Package)
+    for(dep in deps) {
+      visit(dep)
+    }
+
+    all_deps[[pkg$Package]] <<- pkg
+  }
+  
+  for (pkg in pkgs) {
+    visit(pkg)
   }
   
   all_deps
