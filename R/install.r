@@ -1,89 +1,119 @@
-# Either install_packages successfully installs requested packages or
-# it does nothing: it is an idempotent operation.  However, it caches
-# all intermediate operations in a session temporary directory, so if
-# you have to repeat an install it does not take have to repeat every
-# individual operation.
-#
-# Temporary files are only cleaned up once the package has been
-# succesffuly removed
-#
-# If you want to build a source package, how could you easily install binary
-# versions of all dependencies?
-#
-# If dependencies are available in other libraries than the one in installing
-# in, we don't need to download - only need to copy. That could be a separate
-# function: e.g. `complete_library`.
-#
-# @returns Packages (along with versions), that were successfully installed
-install_packages <- function(packages, type = "binary", repos = getOption("repos"),
-                             library = .libPaths()[1], suggests = FALSE, force = FALSE, ...) {
+#' Install specified packages into a library.
+#' 
+#' @section Atomicity:
+#' 
+#' If it is not possible to satisfy the dependency with the available sources,
+#' the installation process will before any packages are replaced. Otherwise,
+#' installation of an individual package either succeeds or fails - it never
+#' ends up in a partially installed state. When installing many packages, 
+#' however, some packages may succeed before the first failure.
+#' 
+#' @param package_names character vector containing names of packages to install
+#' @param library library (path) in which to install package
+#' @param reinstall if \code{TRUE} will force reinstallation of dependent 
+#'   packages that are already installed. If \code{FALSE}, only missing packages
+#'   will be installed. The packages listed in \code{package_names} will always
+#'   be installed.
+#' @param sources a list of package sources. See \code{\link{default_sources}}
+#'   for more details about which sources are used by default. Additionally,
+#'   individual (non-CRAN) packages can provide additional sources in their 
+#'   description files.
+#' @returns (Invisibly) package information for downloaded packages.
+install_packages <- function(package_names, library = .libPaths()[1], 
+                             reinstall = FALSE, 
+                             sources = default_sources(force = reinstall)) {
   assert_that(is.character(packages))
-  assert_that(is.string(library))
+  assert_that(is.dir(library), is.writeable(library))
+  assert_that(is.flag(force))
+  assert_that(is.source(sources))
+  
+  # Convert names to packages and add dependencies. 
+  packages <- lapply(package_names, function(x) package_info(x, sources))
+  packages <- add_dependencies(packages, sources = sources)
 
-  if (is.null(repos)) {
-    stop("Please select cran mirror with chooseCRANmirror()")
-  }
-  assert_that(is.string(type))
-  type <- match.arg(type, c("binary", "source"))
-  if (type == "binary") {
-    type <- .Platform$pkgType
-    if (type == "source") {
-      stop("Your platform does not have binaries available", call. = FALSE)
-    }
-  }
-  url <- contrib.url(repos, type)
-
-  # Add dependencies
-  deps <- find_dependencies(packages, url, deps = dependencies)
-  needed <- deps$status
-  if (any(needed)) {
-    if (!quiet) {
-      message("Also installing dependencies: \n", paste0("* ",
-        deps$status[needed], " (", deps$status[needed], ")", collapse = "\n"))
-    }
-    packages <- unique(c(packages, deps$name[needed]))
-  }
-
-  # Cleanup, if requested
-  working_dir <- file.path(tempdir(), "packman")
-
-  downloaded <- download_packages(packages, type = type)
-  if (type == "source") {
-    built <- build_packages(downloaded)
+  if (reinstall) {
+    to_install <- packages
   } else {
-    build <- downloaded
+    to_install <- Filter(Negate(is.installed), packages)  
+  }
+  
+  # TODO: check that the packages aren't missing
+  
+  if (!quiet) {
+    message("Installing packages ", paste(names(to_install), collapse = ", "))
   }
 
-  installed <- install_binary_packages(downloaded, library)
-
-  clean_up(c(downloaded, built))
-
-  # If any installed packages were already loaded, need to either reload
-  # packages, or advise author to restart R
-
-  invisible(installed)
-}
-
-# Needs to succeed or fail as a whole
-install_binary_packages <- function(packages, library) {
-  # Check library is writeable
-  # Check tmpdir is writeable
-
+  # TODO: unload loaded packages
+  # TODO: special case for packman (so you can reinstall it)
+  
+  for (pkg in to_install) {
+    install(pkg, library = library, quiet = quiet)
+  }
+  invisible(to_install)
 }
 
 # Needs to restore to previous state on failure
-install_binary_package <- function(path, library) {
-  message("Installing ", basename(path))
-
+install_package <- function(path, library, quiet = FALSE) {
+  assert_that(is.string(path))
+  assert_that(is.dir(library), is.writeable(library))
+  
+  if (!quiet) {
+    message("Installing ", basename(path), " to ", library)
+  }
+  
   # Decompresses file (ignoring extension)
   unzipped <- decompress(package)
   on.exit(unlink(unzipped))
+  
+  # Check that it's ok (if possible)
+  check_checksums(unzipped)
+  
+  # Build, if needed
+  if (is_binary_package(unzipped)) {
+    unzipped <- build_package(unzipped)
+  }
+  
+  desc <- as.description(file(file.path(unzipped, "DESCRIPTION")))
 
+  # If previously installed, copy permissions and then move to tempdir
+  # TODO: figure out how to make atomic, so that if file.rename fails, 
+  #  the whole process fails.
+  inst_path <- file.path(library, desc$Package)
+  if (file.exists(inst_path)) {
+    if (!is_binary_package(inst_path)) {
+      stop("Installing will replace ", inst_path, " but that path is not a ", 
+           "package", call. = FALSE)
+    }
+    
+    copy_permissions(inst_path, unzipped)
+    file.rename(inst_path, tempdir())
+  }
+  
+  file.copy(unzipped, inst_path, recursive = TRUE)
+  invisible(inst_path)
+}
+
+#' Is path a binary (or source) package?
+#' 
+#' @param path path to putative package
+#' @return \code{TRUE} if a binary package, \code{FALSE} if a source package,
+#'   otherwise will throw an informative error message
+is_binary_package <- function(path) {
+  assert_that(is.dir(path), is.readable(path))
+  
+  desc_path <- file.path(path, "DESCRIPTION")
+  if (!file.exists(desc_path)) {
+    stop(path, " is not a package (does not contain a DESCRIPTION file)", 
+         call. = FALSE)
+  }
+  
   package_path <- file.path(unzipped, "Meta", "package.rds")
   if (!file.exists(package_path)) {
-    stop(package, " is not a valid binary package (Meta/package.rds not found)")
+    # Must be a source package, and there's no way to verify it's correct
+    # except to install it.
+    return(FALSE)
   }
-
+    
   desc <- as.list(readRDS(package_path)$DESCRIPTION)
   if (length(desc) < 1L) {
     stop(package, " is not a valid binary package (corrupt Meta/package.rds)")
@@ -95,33 +125,8 @@ install_binary_package <- function(path, library) {
   if (built$platform != .Platform$OS.type) {
     stop(package, " is not a valid binary package (incorrect platform)")
   }
-
-  checksum <- checkMD5sums(pkgname, file.path(tmpDir, pkgname))
-  if (is.na(checksum)) {
-    warning("No checksums present", call. = FALSE)
-  }
-  if (identical(checksum, FALSE)) {
-    stop("File checksums do not match", .call = FALSE)
-  }
-
-  # Checks md5sums
-  # Moves old directory to temp
-  # Moves new directory to old, matching permissions
-
-
-
-
-  # Ideall the following two options should be atomic
-  copy_permissions(old, new)
-  file.move(old, tempdir())
-  file.move(new, library)
-}
-
-clean_up <- function() {
-  res <- unlink(working_dir, recursive = TRUE)
-  if (!identical(res, 0L)) {
-    stop("Cleanup failed", call. = FALSE)
-  }
+  
+  TRUE
 }
 
 parse_built <- function(x) {
@@ -131,4 +136,14 @@ parse_built <- function(x) {
     date = strptime(pieces[[3]], "%Y-%m-%d %H:%M:%S"),
     platform = pieces[[4]]
   )
+}
+
+check_checksums <- function(path) {
+  checksum <- checkMD5sums(basename(path), path)
+  if (is.na(checksum)) {
+    warning("No checksums present", call. = FALSE)
+  }
+  if (identical(checksum, FALSE)) {
+    stop("File checksums do not match", .call = FALSE)
+  }
 }
