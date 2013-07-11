@@ -25,3 +25,8 @@ package_info.missing_source <- function(source, package) {
 }
 #' @S3method package_url missing_source
 package_url.missing_source <- function(source, package) NA_character_
+
+is.missing_source <- function(x) {
+  if (is.description(x)) x <- x$source
+  inherits(x, "missing_source")
+}
