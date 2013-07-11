@@ -10,20 +10,9 @@
 #' package_info(test_source(), "ggplot2")
 description <- function(...) {
   obj <- list(...)
-  
   obj$.sources <- parse_spec(obj$Sources)
-  
-  # Parse all dependences into single dataframe
-  deps <- c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")
-  has_deps <- intersect(deps, names(obj))
-  parsed <- lapply(obj[has_deps], parse_deps)
-  parsed <- Map(function(df, field) {
-    if (nrow(df) == 0) return(df)
-    df$field <- field
-    df
-  }, parsed, has_deps)
-  obj$.dependencies <- do.call("rbind", unname(parsed))
-  
+  obj$.dependencies <- parse_all_deps(obj)
+    
   structure(obj, class = "description")
 }
 

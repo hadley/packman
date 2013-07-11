@@ -1,3 +1,16 @@
+# Parse all dependences into single dataframe
+parse_all_deps <- function(obj) {
+  deps <- c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")
+  has_deps <- intersect(deps, names(obj))
+  parsed <- lapply(obj[has_deps], parse_deps)
+  parsed <- Map(function(df, field) {
+    if (nrow(df) == 0) return(df)
+    df$field <- field
+    df
+  }, parsed, has_deps)
+  do.call("rbind", unname(parsed))
+}
+
 #' Parse package dependency strings.
 #'
 #' @param string to parse. Should look like \code{"R (>= 3.0), ggplot2"} etc.
