@@ -2,6 +2,7 @@ context("Dependencies")
 
 test_that("single local dep resolved", {
   local_dep <- test_source("local-dep")
+  
   deps_b <- find_dependencies("b", sources = local_dep)
   expect_equal(length(deps_b), 0)
   

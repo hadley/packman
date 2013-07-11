@@ -72,6 +72,7 @@ has_package.cran <- function(source, package, version = NULL) {
 
 #' @importFrom digest digest
 packages_gz <- function(url) {
+  url <- file.path(url, "PACKAGES.gz")
   base_path <- file.path(tempdir(), digest(url))
   
   # Download complete .gz file if needed

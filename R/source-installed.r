@@ -20,6 +20,11 @@ installed <- function(paths = .libPaths()) {
   source("installed", paths = paths)
 }
 
+is.installed <- function(x) {
+  if (is.description(x)) x <- x$source
+  inherits(x, "installed")
+}
+
 #' @S3method print installed
 print.installed <- function(x, ...) {
   cat("<Source> Installed packages: \n", paste0("* ", x$paths, "\n"), sep = "")
@@ -61,7 +66,10 @@ base <- function() {
   source(c("base", "installed"), paths = path)
 }
 
-is.base <- function(x) inherits(x, "base")
+is.base <- function(x) {
+  if (is.description(x)) x <- x$source
+  inherits(x, "base")
+}
 
 #' @S3method install base 
 install.base <- function(source, package) {

@@ -22,6 +22,15 @@
   Find all (recursive) dependencies of a package.
 }
 \examples{
-find_dependencies("ggplot2")
+deps <- find_dependencies("ggplot2")
+sapply(deps, is.installed)
+
+# Base packages are never included in the list of dependencies
+sapply(deps, is.base)
+
+# Supplying a different set of sources will determine whether or not
+# packages are already installed.
+deps2 <- find_dependencies("ggplot2", sources = default_sources(TRUE))
+sapply(deps2, is.installed)
 }
 

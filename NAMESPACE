@@ -1,5 +1,6 @@
 S3method(as.description,character)
 S3method(as.description,connection)
+S3method(as.description,data.frame)
 S3method(as.description,list)
 S3method(as.sources,source)
 S3method(as.sources,sources)

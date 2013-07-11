@@ -45,11 +45,16 @@ as.description.connection <- function(x, source) {
   as.description(obj, source)
 }
 
+#' @S3method as.description data.frame
+as.description.data.frame <- function(x, source) {
+  as.description(as.list(x), source)
+}
+
 #' @S3method as.description list
 as.description.list <- function(x, source) {
   x$source <- source
   
-  do.call("description", x) 
+  do.call("description", x)
 }
 
 #' @S3method install description
