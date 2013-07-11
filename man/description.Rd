@@ -22,4 +22,8 @@
 \description{
   This object represents a package \code{DESCRIPTION} file.
 }
+\examples{
+package_info(base(), "MASS")
+package_info(test_source(), "ggplot2")
+}
 

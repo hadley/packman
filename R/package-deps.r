@@ -70,7 +70,7 @@ package_deps <- function(info, from = c("Depends", "Imports", "LinkingTo"),
   # Parse all dependences into single dataframe
   parsed <- lapply(info[from], parse_deps)
   deps <- do.call("rbind", unname(parsed))
-    
+  
   # For each package, find the info that conforms to the spec
   pkgs <- setNames(deps$name, deps$name)
   

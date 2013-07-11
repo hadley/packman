@@ -5,13 +5,39 @@
 #' @param ... fields that become components of the package. These are currently
 #'   not verified in any way.
 #' @export
+#' @examples
+#' package_info(base(), "MASS")
+#' package_info(test_source(), "ggplot2")
 description <- function(...) {
-  structure(list(...), class = "description")
+  obj <- list(...)
+  
+  obj$.sources <- parse_spec(obj$Sources)
+  
+  # Parse all dependences into single dataframe
+  deps <- c("Depends", "Imports", "LinkingTo", "Suggests", "Enhances")
+  has_deps <- intersect(deps, names(obj))
+  parsed <- lapply(obj[has_deps], parse_deps)
+  parsed <- Map(function(df, field) {
+    df$field <- field
+    df
+  }, parsed, has_deps)
+  obj$.dependencies <- do.call("rbind", unname(parsed))
+  
+  structure(obj, class = "description")
 }
 
 #' @S3method print description
 print.description <- function(x, ...) {
   cat("<Package> ", x$Package, "\n", sep = "")
+  
+  deps <- x$.dependencies
+  if (!is.null(deps)) {
+    deps_string <- paste0("Deps: ", paste0(deps$name, 
+                          " (", tolower(substr(deps$field, 1, 1)), ")", 
+                          collapse = ", "))
+    cat(strwrap(deps_string, exdent = 2), sep = "\n")
+  }
+  
   print(x$source)
 }
 
