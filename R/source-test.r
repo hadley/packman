@@ -6,16 +6,14 @@
 #' @param path path to directory containing \code{.dcf} files
 #' @export
 #' @examples
-#' s <- test_source(tester())
+#' s <- test_source()
 #' s
 #' has_package(s, "a")
 #' package_info(s, "a")
-test_source <- function(path) {
+test_source <- function(path = system.file("test-source", package = "packman")) {
   assert_that(is.dir(path))
   source("test", path = path)
 }
-
-tester <- function() system.file("test-source", package = "packman")
 
 test_path <- function(x, package) {
   file.path(x$path, paste0(package, ".dcf"))
@@ -27,7 +25,7 @@ print.test <- function(x, ...) {
 }
 
 #' @S3method has_package test
-has_package.test <- function(source, package, version) {
+has_package.test <- function(source, package, version = NULL) {
   if (is.null(version)) {
     file.exists(test_path(source, package))
   } else {

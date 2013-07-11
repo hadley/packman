@@ -2,7 +2,7 @@
 \alias{test_source}
 \title{Testing source}
 \usage{
-  test_source(path)
+  test_source(path = system.file("test-source", package = "packman"))
 }
 \arguments{
   \item{path}{path to directory containing \code{.dcf}
@@ -14,7 +14,7 @@
   useful for testing.
 }
 \examples{
-s <- test_source(tester())
+s <- test_source()
 s
 has_package(s, "a")
 package_info(s, "a")
