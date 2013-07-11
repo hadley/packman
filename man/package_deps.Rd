@@ -18,4 +18,5 @@
 ggplot2 <- package_info(default_sources(), "ggplot2")
 package_deps(ggplot2)
 }
+\keyword{internal}
 

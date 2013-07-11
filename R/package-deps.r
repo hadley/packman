@@ -1,11 +1,20 @@
-#' Find all dependencies of a package.
+#' Find all (recursive) dependencies of a package.
 #' 
+#' @param pkg a single package name
+#' @param from which DESCRIPTION fields to use to compute dependencies.
+#'    Defaults to depends, imports and linking to
+#' @param sources The sources in which to look for \code{pkg}. These will also
+#'    be used for dependencies of \code{pkg}, as well as any additional 
+#'    sources described in individual packages.
 #' @export
 #' @examples
 #' find_dependencies("ggplot2")
 find_dependencies <- function(pkg = NULL, 
                               from = c("Depends", "Imports", "LinkingTo"),
                               sources = default_sources()) {
+  assert_that(is.string(pkg))
+  assert_that(is.character(from), length(from) > 0)
+  assert_that(is.source(sources))
   
   info <- package_info(sources, pkg)
   if (is.null(info)) stop("Couldn't find info about ", pkg, call. = FALSE)
@@ -41,10 +50,12 @@ find_dependencies <- function(pkg = NULL,
 #' 
 #' @param info a list containing package information
 #' @param from which fields to consider dependencies from
+#' @keywords internal
 #' @examples
 #' ggplot2 <- package_info(default_sources(), "ggplot2")
 #' package_deps(ggplot2)
-package_deps <- function(info, from = c("Depends", "Imports", "LinkingTo"), sources = default_sources()) {
+package_deps <- function(info, from = c("Depends", "Imports", "LinkingTo"), 
+                         sources = default_sources()) {
   pkg_sources <- parse_spec(info$Sources)
   
   # Parse all dependences into single dataframe
