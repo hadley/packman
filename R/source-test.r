@@ -28,7 +28,12 @@ print.test <- function(x, ...) {
 
 #' @S3method has_package test
 has_package.test <- function(source, package, version) {
-  file.exists(test_path(source, package))
+  if (is.null(version)) {
+    file.exists(test_path(source, package))
+  } else {
+    info <- package_info(source, package)
+    compare_versions(info$Version, version)
+  }
 }
 
 #' @S3method package_info test
