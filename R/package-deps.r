@@ -5,9 +5,7 @@
 #' find_dependencies("ggplot2")
 find_dependencies <- function(pkg = NULL, 
                               from = c("Depends", "Imports", "LinkingTo"),
-                              force = FALSE) {
-  
-  sources <- default_sources(force)
+                              sources = default_sources()) {
   
   info <- package_info(sources, pkg)
   if (is.null(info)) stop("Couldn't find info about ", pkg, call. = FALSE)

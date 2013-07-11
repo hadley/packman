@@ -4,7 +4,7 @@
 \usage{
   find_dependencies(pkg = NULL,
     from = c("Depends", "Imports", "LinkingTo"),
-    force = FALSE)
+    sources = default_sources())
 }
 \description{
   Find all dependencies of a package.
