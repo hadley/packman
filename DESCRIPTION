@@ -30,3 +30,4 @@ Collate:
     'package-deps.r'
     'package.r'
     'source-test.r'
+    'source-missing.r'
